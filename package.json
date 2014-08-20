@@ -1,0 +1,28 @@
+{
+  "name": "tessel-reactive",
+  "version": "0.1.0",
+  "description": "Reactive Programming For Tessel.IO",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "nodeunit test/index.js"
+  },
+  "keywords": [
+    "reactive",
+    "tessel",
+    "io",
+    "pins",
+    "controller",
+    "conversation",
+    "event",
+    "trigger",
+    "command"
+  ],
+  "dependencies": {
+    "baconjs": "latest"
+  },
+  "devDependencies": {
+    "nodeunit": "latest"
+  },
+  "author": "Daan Kets",
+  "license": "Private"
+}
