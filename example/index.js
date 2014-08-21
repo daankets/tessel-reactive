@@ -5,6 +5,8 @@
 	"use strict";
 	var SKIP_DUPLICATES = true;
 
+	console.info("This example assumes a climate module on port B, ambient on port C, relay on port A and a pushbutton on GPIO G4 (&GND):");
+
 	var tessel = require("tessel"),
 		tr = require("../lib"),
 		climate = require("climate-si7020"),
@@ -33,12 +35,25 @@
 		console.error(err);
 	});
 
-	var buttonStream = tr.buttonInputStream(tessel.button, "button 2");
+	var button2InputStream = tr.buttonInputStream(tessel.button, "button 2");
+	var largeButtonInputPin = tr.digitalPinInputStream(tessel.port.GPIO.pin.G4, "digital GPIO:G4", 250);
+
+	/*
+	 setInterval(function () {
+	 console.log("G4:" + largeButtonInputPin.read());
+	 }, 1000);
+	 */
+
+	//largeButtonInputPin.input(); // Configure as input.
+	var largeButtonInputStream = tr.common.eventStream(largeButtonInputPin, {source: "large button", type: "button"}, function (value, event) {
+		return (value === false);
+	}, false);
+
 	var led1OutputStream = tr.digitalPinOutputBus(tessel.led[1]);
 
-	led1OutputStream.plug(buttonStream);
+	led1OutputStream.plug(button2InputStream);
 
-	var motionStream = tr.common.eventStream(buttonStream, {type: "motion", source: "pir"},
+	var motionStream = tr.common.eventStream(button2InputStream, {type: "motion", source: "pir"},
 		function (value, event) {
 			event.state = value ? "motion" : "no motion";
 		}
@@ -56,7 +71,7 @@
 	climateOutputBus.push({type: "temperatureDifference", value: 6.3});
 	climateOutputBus.push({type: "humidityDifference", value: -12.6});
 
-	var inputs = buttonStream.merge(motionStream).merge(climateStream).merge(ambientStream).merge(relay1InputStream);
+	var inputs = button2InputStream.merge(motionStream).merge(climateStream).merge(ambientStream).merge(relay1InputStream).merge(largeButtonInputStream);
 
 	inputs.onValue(function (value) {
 		console.log(JSON.stringify(value));
