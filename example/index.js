@@ -50,16 +50,15 @@
 	var relay1InputStream = tr.relay.relayInputStream(modules.relayA, "relay A", 1);
 	var relay1OutputBus = tr.relay.relayOutputBus(modules.relayA, 1);
 
+	var climateOutputBus = tr.climate.climateOutputBus(modules.climateB);
+
+	// Calibrate temperature
+	climateOutputBus.push({type: "temperatureDifference", value: 6.3});
+	climateOutputBus.push({type: "humidityDifference", value: -12.6});
+
 	var inputs = buttonStream.merge(motionStream).merge(climateStream).merge(ambientStream).merge(relay1InputStream);
 
 	inputs.onValue(function (value) {
 		console.log(JSON.stringify(value));
 	});
-
-	modules.relayA.on("ready", function () {
-		setInterval(function () {
-			modules.relayA.toggle(1);
-		}, 3000);
-	});
-
 }());
