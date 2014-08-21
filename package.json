@@ -18,7 +18,8 @@
 		"baconjs": "latest",
 		"climate-si7020": "latest",
 		"ambient-attx4": "latest",
-		"wifi-cc3000": "latest"
+		"wifi-cc3000": "latest",
+		"relay-mono": "latest"
 	},
 	"author": "Daan Kets",
 	"license": "Private"

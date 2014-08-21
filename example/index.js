@@ -7,8 +7,17 @@
 
 	var tessel = require("tessel"),
 		tr = require("../lib"),
+		climate = require("climate-si7020"),
+		ambient = require("ambient-attx4"),
 		wifi = require("wifi-cc3000"),
+		relay = require("relay-mono"),
 		http = require("http");
+
+	var modules = {
+		climateB: climate.use(tessel.port.B),
+		ambientC: ambient.use(tessel.port.C),
+		relayA: relay.use(tessel.port.A)
+	};
 
 	var sensors = {};
 
@@ -24,23 +33,33 @@
 		console.error(err);
 	});
 
-	var button = tr.buttonInputStream(tessel.button, "button 2");
-	var led1Output = tr.digitalPinOutputBus(tessel.led[1]);
+	var buttonStream = tr.buttonInputStream(tessel.button, "button 2");
+	var led1OutputStream = tr.digitalPinOutputBus(tessel.led[1]);
 
-	led1Output.plug(button);
+	led1OutputStream.plug(buttonStream);
 
-	var motion = tr.common.eventStream(button, {type: "motion", source: "pir"},
+	var motionStream = tr.common.eventStream(buttonStream, {type: "motion", source: "pir"},
 		function (value, event) {
 			event.state = value ? "motion" : "no motion";
 		}
 	);
 
-	var climate = tr.climate.climateInputStream(tessel.port.B, "climate B", 1000, 1, SKIP_DUPLICATES);
-	var ambient = tr.ambient.ambientInputStream(tessel.port.C, "ambient C", 1000, 1, SKIP_DUPLICATES);
+	var climateStream = tr.climate.climateInputStream(modules.climateB, "climate B", 1000, 1, SKIP_DUPLICATES);
+	var ambientStream = tr.ambient.ambientInputStream(modules.ambientC, "ambient C", 1000, 1, SKIP_DUPLICATES);
 
-	var total = button.merge(motion).merge(climate).merge(ambient);
+	var relay1InputStream = tr.relay.relayInputStream(modules.relayA, "relay A", 1);
+	var relay1OutputBus = tr.relay.relayOutputBus(modules.relayA, 1);
 
-	total.onValue(function (value) {
+	var inputs = buttonStream.merge(motionStream).merge(climateStream).merge(ambientStream).merge(relay1InputStream);
+
+	inputs.onValue(function (value) {
 		console.log(JSON.stringify(value));
 	});
+
+	modules.relayA.on("ready", function () {
+		setInterval(function () {
+			modules.relayA.toggle(1);
+		}, 3000);
+	});
+
 }());
