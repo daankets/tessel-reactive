@@ -1,26 +1,28 @@
 {
 	"name": "tessel-reactive",
 	"version": "0.1.0",
-	"description": "Reactive Programming For Tessel.IO",
+	"description": "Reactive programming library For Tessel.IO",
 	"main": "lib/index.js",
+
+	"directories": {
+		"lib": "lib"
+	},
+	
 	"keywords": [
 		"reactive",
 		"tessel",
 		"io",
 		"pins",
-		"controller",
-		"conversation",
+		"button",
+		"motion",
+		"climate",
+		"ambient",
 		"event",
-		"trigger",
 		"command"
 	],
 	"dependencies": {
-		"baconjs": "latest",
-		"climate-si7020": "latest",
-		"ambient-attx4": "latest",
-		"wifi-cc3000": "latest",
-		"relay-mono": "latest"
+		"baconjs": "latest"
 	},
-	"author": "Daan Kets",
-	"license": "Private"
+	"author": "Daan Kets (Blackbit Consulting)",
+	"license": "MIT"
 }
